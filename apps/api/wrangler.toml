@@ -8,11 +8,11 @@ compatibility_flags = ["nodejs_compat"]
 directory = "public"
 not_found_handling = "single-page-application"
 
-# D1 Database
+# D1 Database - UPDATE THIS after running: wrangler d1 create your-db-name
 [[d1_databases]]
 binding = "DB"
-database_name = "0list-db"
-database_id = "local"
+database_name = "my-waitlist-db"
+database_id = "YOUR_DATABASE_ID"
 
 # Email sending (Cloudflare Email Workers)
 # Uncomment and configure after setting up Email Routing on your domain
@@ -21,9 +21,6 @@ database_id = "local"
 # destination_address = "admin@yourdomain.com"
 
 [vars]
-# Demo mode - disables all write operations
-# DEMO_MODE = "true"
-
 # For local dev without Cloudflare Access, leave these unset
 # The app will run in "dev mode" with auth bypassed
 
@@ -32,17 +29,3 @@ database_id = "local"
 # CF_ACCESS_AUD = "your-application-audience-tag"
 # RESEND_API_KEY = "re_xxx"
 # RESEND_FROM_EMAIL = "waitlist@yourdomain.com"
-
-# =============================================================================
-# Demo Environment - deployed automatically via GitHub Actions
-# =============================================================================
-[env.demo]
-name = "0list-demo"
-
-[env.demo.vars]
-DEMO_MODE = "true"
-
-[[env.demo.d1_databases]]
-binding = "DB"
-database_name = "0list-demo-db"
-database_id = "your-demo-database-id"  # Set after running: wrangler d1 create 0list-demo-db

@@ -49,13 +49,39 @@ jobs:
         working-directory: apps/api
         run: bun run seed:generate
 
+      # Create demo-specific wrangler config (not committed to repo)
+      - name: Create demo wrangler config
+        working-directory: apps/api
+        env:
+          D1_DATABASE_NAME: ${{ secrets.D1_DATABASE_NAME }}
+          D1_DATABASE_ID: ${{ secrets.D1_DATABASE_ID }}
+        run: |
+          cat > wrangler.demo.toml << EOF
+          name = "0list-demo"
+          main = "src/index.tsx"
+          compatibility_date = "2024-12-30"
+          compatibility_flags = ["nodejs_compat"]
+
+          [assets]
+          directory = "public"
+          not_found_handling = "single-page-application"
+
+          [[d1_databases]]
+          binding = "DB"
+          database_name = "${D1_DATABASE_NAME}"
+          database_id = "${D1_DATABASE_ID}"
+
+          [vars]
+          DEMO_MODE = "true"
+          EOF
+
       - name: Run migrations
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/api
-          command: d1 migrations apply 0list-demo-db --remote --env demo
+          command: d1 migrations apply ${{ secrets.D1_DATABASE_NAME }} --remote
 
       - name: Seed database
         uses: cloudflare/wrangler-action@v3
@@ -63,7 +89,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/api
-          command: d1 execute 0list-demo-db --remote --file=scripts/seed.sql --env demo
+          command: d1 execute ${{ secrets.D1_DATABASE_NAME }} --remote --file=scripts/seed.sql
 
       - name: Deploy worker
         uses: cloudflare/wrangler-action@v3
@@ -71,4 +97,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/api
-          command: deploy --env demo
+          command: deploy --config wrangler.demo.toml

@@ -95,6 +95,7 @@
         "@resvg/resvg-js": "^2.6.2",
         "satori": "^0.18.3",
         "sharp": "^0.34.5",
+        "wrangler": "^4.58.0",
       },
     },
     "packages/create-0list": {
