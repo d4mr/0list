@@ -70,6 +70,7 @@ jobs:
           binding = "DB"
           database_name = "${D1_DATABASE_NAME}"
           database_id = "${D1_DATABASE_ID}"
+          migrations_dir = "drizzle"
 
           [vars]
           DEMO_MODE = "true"
