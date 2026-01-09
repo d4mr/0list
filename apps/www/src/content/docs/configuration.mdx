@@ -1,0 +1,156 @@
+---
+title: Configuration
+description: Environment variables, Cloudflare settings, and service configuration.
+order: 2
+---
+
+import { Steps, Callout, CodeBlock, LinkCard } from '../../components/docs';
+
+# Configuration
+
+Environment variables, Cloudflare settings, and service configuration.
+
+## Environment Variables
+
+Configure 0list through your `wrangler.toml` file and Wrangler secrets.
+
+<CodeBlock
+  title="wrangler.toml"
+  lang="toml"
+  code={`name = "0list"
+main = "src/index.tsx"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "0list-db"
+database_id = "your-database-id-here"
+
+[vars]
+# Optional: Default allowed origins for CORS
+ALLOWED_ORIGINS = "https://yoursite.com,https://app.yoursite.com"`}
+/>
+
+### Required Settings
+
+| Variable | Description |
+|----------|-------------|
+| `DB` | D1 database binding (configured automatically) |
+
+### Optional Settings
+
+| Variable | Description |
+|----------|-------------|
+| `RESEND_API_KEY` | Resend API key for sending emails |
+| `RESEND_FROM_EMAIL` | Default from email address |
+| `RESEND_FROM_NAME` | Default from name |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins |
+
+---
+
+## Cloudflare Access Setup
+
+The admin dashboard is protected by [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/). You'll need to configure an Access application to secure the `/admin` routes.
+
+<Callout type="info">
+  Cloudflare Access is included free with all Cloudflare plans. You can use email OTP, social logins, or corporate identity providers.
+</Callout>
+
+<Steps>
+  <div>Go to **Cloudflare Zero Trust** → **Access** → **Applications**</div>
+  <div>Click **"Add an application"** and select **"Self-hosted"**</div>
+  <div>Set the application domain to your worker URL (e.g., `my-waitlist.workers.dev`)</div>
+  <div>Add `/admin/*` as the path to protect</div>
+  <div>Configure an identity provider (email OTP works great for small teams)</div>
+  <div>Create an access policy allowing your team members</div>
+</Steps>
+
+---
+
+## Resend Email Configuration
+
+0list uses [Resend](https://resend.com) for sending confirmation and welcome emails. The free tier includes 3,000 emails/month.
+
+<Steps>
+  <div>Create a [Resend account](https://resend.com/signup)</div>
+  <div>Add and verify your sending domain</div>
+  <div>Generate an API key</div>
+  <div>Add the API key as a Wrangler secret</div>
+</Steps>
+
+<CodeBlock
+  title="Configuration"
+  lang="bash"
+  code={`# Set via Wrangler secrets (recommended)
+bunx wrangler secret put RESEND_API_KEY
+
+# Or in wrangler.toml for development
+[vars]
+RESEND_API_KEY = "re_xxxxxxxxxxxx"
+RESEND_FROM_EMAIL = "noreply@yourdomain.com"
+RESEND_FROM_NAME = "Your Company"`}
+/>
+
+<Callout type="warning" title="Security">
+  Always use `wrangler secret put` for API keys in production. Never commit secrets to your repository.
+</Callout>
+
+---
+
+## CORS & Allowed Origins
+
+Configure CORS to allow your frontend domains to call the public API. Origins can be set globally or per-waitlist.
+
+### Per-Waitlist Configuration
+
+In the admin dashboard, go to your waitlist's **Settings** → **Integrations** tab to configure allowed origins for that specific waitlist.
+
+### Global Default
+
+Set a default list of allowed origins in your `wrangler.toml`:
+
+<CodeBlock
+  title="CORS Configuration"
+  lang="toml"
+  code={`[vars]
+ALLOWED_ORIGINS = "https://example.com,https://app.example.com"
+
+# The API will include CORS headers:
+# Access-Control-Allow-Origin: https://example.com
+# Access-Control-Allow-Methods: GET, POST, OPTIONS
+# Access-Control-Allow-Headers: Content-Type`}
+/>
+
+<Callout type="tip">
+  For development, you can add `http://localhost:3000` to your allowed origins.
+</Callout>
+
+---
+
+## Custom Domain
+
+By default, your worker is accessible at `your-worker.workers.dev`. You can add a custom domain:
+
+<Steps>
+  <div>Go to **Workers & Pages** in the Cloudflare dashboard</div>
+  <div>Select your worker</div>
+  <div>Go to **Settings** → **Domains & Routes**</div>
+  <div>Add your custom domain (must be on Cloudflare DNS)</div>
+</Steps>
+
+---
+
+## Next Steps
+
+<div class="grid sm:grid-cols-2 gap-3 not-prose mt-6">
+  <LinkCard
+    title="API Reference"
+    description="Explore all API endpoints"
+    href="/docs/api"
+  />
+  <LinkCard
+    title="Email Templates"
+    description="Customize confirmation emails"
+    href="/docs/emails"
+  />
+</div>

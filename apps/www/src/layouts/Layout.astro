@@ -1,0 +1,151 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  noIndex?: boolean;
+}
+
+const SITE_URL = "https://0list.d4mr.com";
+const {
+  title,
+  description = "Self-hosted waitlist software for Cloudflare Workers. Fast, free, yours.",
+  ogImage = "/og/home.webp",
+  noIndex = false,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, SITE_URL);
+const ogImageURL = new URL(ogImage, SITE_URL);
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <meta name="description" content={description} />
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="0list" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="0list" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "0list",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Cloudflare Workers",
+      "description": description,
+      "url": SITE_URL,
+      "author": {
+        "@type": "Person",
+        "name": "d4mr",
+        "url": "https://github.com/d4mr"
+      },
+      "license": "https://opensource.org/licenses/MIT",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    })} />
+  </head>
+  <body class="min-h-screen bg-background text-foreground">
+    <!-- Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <nav class="mx-auto max-w-6xl px-6 h-14 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2 font-semibold text-lg">
+          <img src="/favicon.svg" alt="0list" class="w-7 h-7 rounded-md" />
+          <span>0list</span>
+        </a>
+
+        <div class="flex items-center gap-6">
+          <a href="/docs" class="text-sm text-muted-foreground hover:text-foreground transition-colors">Docs</a>
+          <a href="https://github.com/d4mr/0list" target="_blank" rel="noopener" class="text-sm text-muted-foreground hover:text-foreground transition-colors">GitHub</a>
+          <a href="https://github.com/d4mr/0list" target="_blank" rel="noopener" class="btn btn-primary text-sm py-2 px-4">
+            Get Started
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-border">
+      <div class="mx-auto max-w-6xl px-6 py-12">
+        <div class="flex flex-col md:flex-row justify-between items-start gap-8">
+          <div>
+            <a href="/" class="flex items-center gap-2 font-semibold text-lg mb-3">
+              <img src="/favicon.svg" alt="0list" class="w-6 h-6 rounded" />
+              <span>0list</span>
+            </a>
+            <p class="text-sm text-muted-foreground max-w-xs">
+              Self-hosted waitlist software for Cloudflare Workers. Fast, free, forever yours.
+            </p>
+          </div>
+
+          <div class="flex gap-16">
+            <div>
+              <h4 class="text-sm font-medium mb-3">Product</h4>
+              <ul class="space-y-2 text-sm text-muted-foreground">
+                <li><a href="/docs" class="hover:text-foreground transition-colors">Documentation</a></li>
+                <li><a href="/docs/getting-started" class="hover:text-foreground transition-colors">Getting Started</a></li>
+                <li><a href="/docs/api" class="hover:text-foreground transition-colors">API Reference</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="text-sm font-medium mb-3">Resources</h4>
+              <ul class="space-y-2 text-sm text-muted-foreground">
+                <li><a href="https://github.com/d4mr/0list" target="_blank" class="hover:text-foreground transition-colors">GitHub</a></li>
+                <li><a href="https://github.com/d4mr/0list/issues" target="_blank" class="hover:text-foreground transition-colors">Issues</a></li>
+                <li><a href="https://github.com/d4mr/0list/releases" target="_blank" class="hover:text-foreground transition-colors">Releases</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-12 pt-6 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p class="text-xs text-muted-foreground">
+            Made with love by <a href="https://github.com/d4mr" target="_blank" class="text-foreground hover:text-primary transition-colors">d4mr</a> and <span class="text-foreground">Claude Opus 4.5</span>
+          </p>
+          <p class="text-xs text-muted-foreground">
+            MIT License
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

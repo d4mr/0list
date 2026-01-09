@@ -1,0 +1,367 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const SITE_URL = "https://0list.d4mr.com";
+const { title, description, ogImage = "/og/docs.webp" } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, SITE_URL);
+const ogImageURL = new URL(ogImage, SITE_URL);
+
+const navigation = [
+  {
+    title: 'Getting Started',
+    items: [
+      { title: 'What is 0list?', href: '/docs/guide' },
+      { title: 'Quick Start', href: '/docs/getting-started' },
+    ]
+  },
+  {
+    title: 'Configuration',
+    items: [
+      { title: 'Environment & Settings', href: '/docs/configuration' },
+      { title: 'Authentication', href: '/docs/authentication' },
+    ]
+  },
+  {
+    title: 'API Reference',
+    items: [
+      { title: 'REST API', href: '/docs/api' },
+    ]
+  },
+  {
+    title: 'Customization',
+    items: [
+      { title: 'Email Templates', href: '/docs/emails' },
+      { title: 'Custom Fields', href: '/docs/custom-fields' },
+      { title: 'Branding', href: '/docs/branding' },
+    ]
+  }
+];
+
+const currentPath = Astro.url.pathname;
+// Remove trailing slash for comparison
+const normalizedPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <meta name="description" content={description || "0list documentation"} />
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="0list Docs" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description || "0list documentation"} />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="0list" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description || "0list documentation"} />
+    <meta name="twitter:image" content={ogImageURL} />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": title,
+      "description": description || "0list documentation",
+      "url": canonicalURL.toString(),
+      "image": ogImageURL.toString(),
+      "author": {
+        "@type": "Person",
+        "name": "d4mr",
+        "url": "https://github.com/d4mr"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "0list",
+        "url": SITE_URL
+      },
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "0list Documentation",
+        "url": SITE_URL + "/docs"
+      }
+    })} />
+  </head>
+  <body class="min-h-screen bg-background text-foreground">
+    <!-- Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <nav class="mx-auto max-w-[90rem] px-6 h-14 flex items-center justify-between">
+        <div class="flex items-center gap-8">
+          <a href="/" class="flex items-center gap-2 font-semibold text-lg">
+            <img src="/favicon.svg" alt="0list" class="w-7 h-7 rounded-md" />
+            <span>0list</span>
+          </a>
+          <div class="hidden md:flex items-center gap-1">
+            <a href="/docs" class="px-3 py-1.5 text-sm font-medium text-foreground rounded-md bg-muted/50">Docs</a>
+            <a href="https://github.com/d4mr/0list" target="_blank" class="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">GitHub</a>
+          </div>
+        </div>
+
+        <a href="https://github.com/d4mr/0list" target="_blank" rel="noopener" class="btn btn-primary text-sm py-2 px-4">
+          Get Started
+        </a>
+      </nav>
+    </header>
+
+    <div class="mx-auto max-w-[90rem]">
+      <div class="flex pt-14">
+        <!-- Sidebar -->
+        <aside class="fixed top-14 bottom-0 w-64 shrink-0 overflow-y-auto hidden lg:block border-r border-border/50">
+          <nav class="py-6 pr-3 pl-5">
+            {navigation.map((section, sectionIndex) => (
+              <div class:list={[sectionIndex > 0 && "mt-6"]}>
+                <h4 class="px-2.5 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wider mb-1.5">
+                  {section.title}
+                </h4>
+                <ul class="space-y-0.5">
+                  {section.items.map((item) => {
+                    const itemPath = item.href.endsWith('/') ? item.href.slice(0, -1) : item.href;
+                    const isActive = normalizedPath === itemPath;
+                    return (
+                      <li>
+                        <a
+                          href={item.href}
+                          class:list={[
+                            "block text-[13px] py-1.5 px-2.5 rounded-md transition-all duration-150",
+                            isActive
+                              ? "text-primary bg-primary/10 font-medium"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          ]}
+                        >
+                          {item.title}
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+          </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="flex-1 lg:pl-64 min-w-0">
+          <div class="max-w-3xl mx-auto px-6 lg:px-10 py-10">
+            <article class="docs-content">
+              <slot />
+            </article>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  /* Docs prose styling - compact but readable */
+  .docs-content h1 {
+    font-size: 2.125rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: 0.5rem;
+    color: var(--foreground);
+  }
+
+  .docs-content h1 + p {
+    font-size: 1rem;
+    color: var(--muted-foreground);
+    margin-bottom: 2rem;
+  }
+
+  .docs-content h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-top: 2.25rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--foreground);
+  }
+
+  .docs-content h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--foreground);
+  }
+
+  .docs-content h4 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin-top: 1.25rem;
+    margin-bottom: 0.375rem;
+    color: var(--foreground);
+  }
+
+  .docs-content p {
+    font-size: 0.9375rem;
+    color: var(--muted-foreground);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  /* Links - only underline inline text links on hover, not cards/blocks */
+  .docs-content a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .docs-content p a:hover,
+  .docs-content li a:hover {
+    text-decoration: underline;
+  }
+
+  .docs-content code:not(pre code) {
+    background: var(--muted);
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  .docs-content ul {
+    color: var(--muted-foreground);
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+    list-style-type: disc;
+  }
+
+  .docs-content ol {
+    color: var(--muted-foreground);
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+    list-style-type: decimal;
+  }
+
+  .docs-content li {
+    font-size: 0.9375rem;
+    margin-bottom: 0.375rem;
+    line-height: 1.6;
+    padding-left: 0.25rem;
+  }
+
+  .docs-content ul > li::marker {
+    color: var(--muted-foreground);
+  }
+
+  .docs-content ol > li::marker {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  .docs-content strong {
+    color: var(--foreground);
+    font-weight: 600;
+  }
+
+  .docs-content hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.75rem 0;
+  }
+
+  .docs-content table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    margin: 1.25rem 0;
+  }
+
+  .docs-content th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    color: var(--foreground);
+    background: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .docs-content th:first-child {
+    border-top-left-radius: 0.375rem;
+  }
+
+  .docs-content th:last-child {
+    border-top-right-radius: 0.375rem;
+  }
+
+  .docs-content td {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    color: var(--muted-foreground);
+  }
+
+  .docs-content tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 0.375rem;
+  }
+
+  .docs-content tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 0.375rem;
+  }
+
+  /* Code blocks in docs */
+  .docs-content .code-block {
+    margin: 1.25rem 0;
+    border-radius: 0.625rem;
+    overflow: hidden;
+  }
+
+  .docs-content .code-block pre {
+    margin: 0;
+  }
+
+  /* Block elements should not have link underlines */
+  .docs-content .callout a:hover,
+  .docs-content .link-card a:hover,
+  .docs-content .steps a:hover {
+    text-decoration: none;
+  }
+
+  /* Next steps grid */
+  .docs-content .grid {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .docs-content .grid.sm\\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .docs-content .grid.sm\\:grid-cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

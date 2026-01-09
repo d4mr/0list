@@ -1,0 +1,55 @@
+{
+  "name": "create-0list",
+  "version": "0.1.0",
+  "description": "CLI to scaffold and deploy 0list waitlist software",
+  "type": "module",
+  "license": "MIT",
+  "author": {
+    "name": "d4mr",
+    "url": "https://github.com/d4mr"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/d4mr/0list.git",
+    "directory": "packages/create-0list"
+  },
+  "homepage": "https://0list.d4mr.com",
+  "bugs": {
+    "url": "https://github.com/d4mr/0list/issues"
+  },
+  "keywords": [
+    "waitlist",
+    "cloudflare",
+    "workers",
+    "d1",
+    "serverless",
+    "self-hosted",
+    "open-source",
+    "cli",
+    "create"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "create-0list": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.1",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.9.3"
+  }
+}

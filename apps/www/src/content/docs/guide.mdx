@@ -1,0 +1,120 @@
+---
+title: What is 0list?
+description: A simple explanation of what 0list does and how it works.
+order: 1.5
+---
+
+import { Steps, Callout, CodeBlock, LinkCard } from '../../components/docs';
+
+# What is 0list?
+
+0list is a self-hosted waitlist system that runs entirely on Cloudflare's infrastructure. It lets you collect signups for your product launch, beta program, or any other waitlist scenario.
+
+## Why 0list?
+
+**The problem**: You're launching something and need to collect emails. You could use a SaaS waitlist tool (monthly fees, data on someone else's servers) or build something yourself (time-consuming, another thing to maintain).
+
+**The solution**: 0list gives you a fully-featured waitlist system that:
+
+- **Costs almost nothing** - Runs on Cloudflare's generous free tier
+- **You own your data** - Everything lives in your Cloudflare account
+- **Works globally** - Deploys to 300+ edge locations worldwide
+- **Takes minutes to deploy** - Not hours or days
+
+## How It Works
+
+The flow is simple:
+
+<Steps>
+  <div>
+    ### User signs up
+
+    Someone visits your landing page and submits their email (and any custom fields you've configured). Your form sends a POST request to your 0list API.
+  </div>
+
+  <div>
+    ### 0list stores the signup
+
+    The API validates the email, checks for duplicates, and saves the signup to your D1 database. If you've enabled double opt-in, it sends a confirmation email.
+  </div>
+
+  <div>
+    ### User confirms (optional)
+
+    If double opt-in is enabled, the user clicks the link in their confirmation email. Their signup is marked as verified.
+  </div>
+
+  <div>
+    ### You manage signups
+
+    Log into your admin dashboard to see everyone who signed up. Search, filter, export to CSV, or invite users when you're ready to launch.
+  </div>
+</Steps>
+
+## The Three Parts
+
+### The API
+
+A REST endpoint that handles signups. You integrate this with your landing page:
+
+<CodeBlock
+  lang="javascript"
+  code={`fetch('https://your-worker.workers.dev/api/waitlists/my-product/signup', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email: 'user@example.com' })
+})`}
+/>
+
+The API validates emails, prevents duplicates, and optionally sends confirmation emails.
+
+### The Admin Dashboard
+
+A web interface for managing everything:
+
+- **Create waitlists** - Different lists for different products or launches
+- **View signups** - See who signed up, when, and their verification status
+- **Search & filter** - Find specific users or segments
+- **Export data** - Download CSVs for importing elsewhere
+- **Configure settings** - Branding, custom fields, email templates
+
+### The Database
+
+Cloudflare D1 stores all your data - waitlist configs, signups, verification tokens. You never touch SQL directly; the dashboard handles everything.
+
+## What Can You Customize?
+
+| Feature | What You Can Do |
+|---------|-----------------|
+| **Branding** | Primary color for emails and embeds |
+| **Custom Fields** | Collect more than just email (name, company, etc.) |
+| **Double Opt-in** | Require email verification |
+| **Email Templates** | Customize confirmation and welcome emails |
+| **CORS Origins** | Control which domains can submit signups |
+
+## Typical Use Cases
+
+- **Product launches** - "Sign up for early access"
+- **Beta programs** - "Join the beta waitlist"
+- **Newsletter signups** - Simple email collection
+- **Event registration** - Collect attendee info
+- **Feature announcements** - "Get notified when X ships"
+
+## Tech Stack
+
+For the curious: Cloudflare Workers for the runtime, D1 for the database, Hono for the API framework, React for the dashboard, and Cloudflare Access for authentication.
+
+## Next Steps
+
+<div class="grid sm:grid-cols-2 gap-4 not-prose">
+  <LinkCard
+    title="Quick Start"
+    description="Deploy your first waitlist"
+    href="/docs/getting-started"
+  />
+  <LinkCard
+    title="Configuration"
+    description="Customize your setup"
+    href="/docs/configuration"
+  />
+</div>

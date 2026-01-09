@@ -1,0 +1,28 @@
+# Turbo
+.turbo
+
+# Build outputs
+dist/
+*.tsbuildinfo
+apps/api/public/*
+!apps/api/public/.gitkeep
+
+# Generated files
+apps/api/scripts/seed.sql
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.dev.vars
+
+# OS
+.DS_Store
+
+# Cloudflare
+.wrangler/
+
+# AI
+.claude/

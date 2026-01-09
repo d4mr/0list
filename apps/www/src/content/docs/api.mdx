@@ -1,0 +1,236 @@
+---
+title: API Reference
+description: Public and admin API endpoints for integrating 0list.
+order: 3
+---
+
+import { Callout, CodeBlock, Badge, LinkCard } from '../../components/docs';
+
+# API Reference
+
+Public and admin API endpoints for integrating 0list.
+
+## Public API
+
+These endpoints are publicly accessible and used for signup flows. They respect CORS settings configured per-waitlist.
+
+### <Badge variant="post">POST</Badge> `/api/w/:slug/signup`
+
+Add a new signup to the waitlist.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `email` | string | **Required.** Email address |
+| `name` | string | Optional. Full name |
+| `referralSource` | string | Optional. Where the signup came from |
+| `customFields` | object | Optional. Custom field values |
+
+<CodeBlock
+  title="Example"
+  lang="typescript"
+  code={`const response = await fetch(
+  "https://your-worker.workers.dev/api/w/my-waitlist/signup",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: "user@example.com",
+      name: "Jane Doe",
+      referralSource: "homepage",
+      customFields: {
+        company: "Acme Inc"
+      }
+    })
+  }
+);
+
+// Response
+{
+  "success": true,
+  "position": 42,
+  "requiresConfirmation": true,
+  "message": "Please check your email to confirm your signup"
+}`}
+/>
+
+---
+
+### <Badge variant="get">GET</Badge> `/api/w/:slug/status`
+
+Check a signup's position and status.
+
+| Query Param | Type | Description |
+|-------------|------|-------------|
+| `email` | string | **Required.** Email to check |
+
+<CodeBlock
+  title="Example"
+  lang="typescript"
+  code={`const response = await fetch(
+  "https://your-worker.workers.dev/api/w/my-waitlist/status?email=user@example.com"
+);
+
+// Response
+{
+  "position": 42,
+  "status": "confirmed",
+  "signedUpAt": "2024-01-15T10:30:00.000Z",
+  "confirmedAt": "2024-01-15T10:32:00.000Z"
+}`}
+/>
+
+---
+
+### <Badge variant="get">GET</Badge> `/api/w/:slug/confirm`
+
+Confirm a signup via email token. Usually triggered by clicking the confirmation email link.
+
+| Query Param | Type | Description |
+|-------------|------|-------------|
+| `token` | string | **Required.** Confirmation token from email |
+
+Redirects to the success/error URL configured in waitlist settings.
+
+---
+
+## Admin API
+
+Admin endpoints require [Cloudflare Access](/docs/configuration#cloudflare-access) authentication. These are used by the admin dashboard and can be used for integrations.
+
+<Callout type="warning" title="Authentication">
+  All admin endpoints require Cloudflare Access headers or an active session.
+</Callout>
+
+### <Badge variant="get">GET</Badge> `/admin/api/waitlists/:id/signups`
+
+List all signups for a waitlist with pagination and filtering.
+
+| Query Param | Type | Description |
+|-------------|------|-------------|
+| `page` | number | Page number (default: 1) |
+| `pageSize` | number | Items per page (default: 50) |
+| `status` | string | Filter by status |
+| `search` | string | Search by email or name |
+
+<CodeBlock
+  title="Example"
+  lang="typescript"
+  code={`const response = await fetch(
+  "https://your-worker.workers.dev/admin/api/waitlists/123/signups",
+  {
+    headers: {
+      "CF-Access-Client-Id": "your-client-id",
+      "CF-Access-Client-Secret": "your-client-secret"
+    }
+  }
+);
+
+// Response
+{
+  "signups": [
+    {
+      "id": 1,
+      "email": "user@example.com",
+      "name": "Jane Doe",
+      "position": 1,
+      "status": "confirmed",
+      "referralSource": "homepage",
+      "signedUpAt": "2024-01-15T10:30:00.000Z"
+    }
+  ],
+  "total": 847,
+  "page": 1,
+  "pageSize": 50
+}`}
+/>
+
+---
+
+## Webhooks
+
+Configure webhook URLs in the waitlist settings to receive real-time notifications for signup events.
+
+### Events
+
+| Event | Description |
+|-------|-------------|
+| `signup.created` | New signup (pending confirmation) |
+| `signup.confirmed` | Signup confirmed via email |
+
+<CodeBlock
+  title="Webhook Payload"
+  lang="json"
+  code={`{
+  "event": "signup.confirmed",
+  "timestamp": "2024-01-15T10:32:00.000Z",
+  "waitlist": {
+    "id": 123,
+    "slug": "my-waitlist",
+    "name": "My Waitlist"
+  },
+  "signup": {
+    "email": "user@example.com",
+    "name": "Jane Doe",
+    "position": 42,
+    "referralSource": "homepage",
+    "customFields": {
+      "company": "Acme Inc"
+    }
+  }
+}`}
+/>
+
+---
+
+## Error Handling
+
+All API endpoints return consistent error responses with a code and message.
+
+<CodeBlock
+  title="Error Response Format"
+  lang="typescript"
+  code={`// Error response format
+{
+  "success": false,
+  "error": {
+    "code": "DUPLICATE_EMAIL",
+    "message": "This email is already on the waitlist"
+  }
+}
+
+// Common error codes:
+// - DUPLICATE_EMAIL: Email already exists
+// - INVALID_EMAIL: Invalid email format
+// - WAITLIST_NOT_FOUND: Waitlist doesn't exist
+// - WAITLIST_CLOSED: Waitlist is not accepting signups
+// - INVALID_TOKEN: Confirmation token invalid/expired
+// - RATE_LIMITED: Too many requests`}
+/>
+
+---
+
+## Rate Limits
+
+Public API endpoints are rate limited to prevent abuse:
+
+- **Signup:** 10 requests per minute per IP
+- **Status:** 30 requests per minute per IP
+
+Admin API endpoints are not rate limited but require authentication.
+
+---
+
+## Next Steps
+
+<div class="grid sm:grid-cols-2 gap-3 not-prose mt-6">
+  <LinkCard
+    title="Configuration"
+    description="Environment variables and settings"
+    href="/docs/configuration"
+  />
+  <LinkCard
+    title="Custom Fields"
+    description="Collect additional signup data"
+    href="/docs/custom-fields"
+  />
+</div>

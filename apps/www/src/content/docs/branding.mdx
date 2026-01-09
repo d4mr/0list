@@ -1,0 +1,135 @@
+---
+title: Branding
+description: Customize the look and feel of your waitlist.
+order: 6
+---
+
+import { Callout, CodeBlock, LinkCard } from '../../components/docs';
+
+# Branding
+
+Customize the look and feel of your waitlist.
+
+## Overview
+
+Each waitlist can have its own branding settings that apply to:
+
+- Confirmation and welcome emails
+- Redirect pages (success/error)
+- Admin dashboard appearance
+
+---
+
+## Email Branding
+
+Customize how emails appear to your users.
+
+### Sender Identity
+
+| Setting | Description |
+|---------|-------------|
+| **From Name** | Name shown in recipient's inbox (e.g., "Acme Inc") |
+| **From Email** | Must be a verified domain in Resend |
+| **Reply-To** | Where replies are sent (can differ from From) |
+
+### Visual Branding
+
+| Setting | Description |
+|---------|-------------|
+| **Logo URL** | Full URL to your logo image (recommended: 200x50px) |
+| **Primary Color** | Hex color for buttons and links (e.g., `#4F46E5`) |
+| **Company Name** | Shown in email footer |
+
+<CodeBlock
+  title="Example Configuration"
+  lang="json"
+  code={`{
+  "fromName": "Acme Inc",
+  "fromEmail": "hello@acme.com",
+  "replyTo": "support@acme.com",
+  "logoUrl": "https://acme.com/logo.png",
+  "primaryColor": "#4F46E5",
+  "companyName": "Acme Inc"
+}`}
+/>
+
+---
+
+## Redirect Pages
+
+After email confirmation, users are redirected to custom URLs.
+
+### Success Redirect
+
+Where users go after successful email confirmation. You can include the position in the URL:
+
+```
+https://yoursite.com/waitlist/success?position={{position}}
+```
+
+### Error Redirect
+
+Where users go if confirmation fails (expired/invalid token):
+
+```
+https://yoursite.com/waitlist/error
+```
+
+<Callout type="tip">
+  Create dedicated landing pages for these redirects to maintain a consistent experience.
+</Callout>
+
+---
+
+## Domain Customization
+
+By default, your API runs on `your-worker.workers.dev`. For a professional appearance:
+
+1. Add a custom domain to your Cloudflare Worker
+2. Update your frontend to use the custom domain
+3. Update email templates to use the custom domain for confirmation links
+
+<Callout type="info">
+  Custom domains require the domain to be on Cloudflare DNS (free).
+</Callout>
+
+---
+
+## Multi-Waitlist Branding
+
+If you run multiple waitlists, each can have completely independent branding:
+
+| Waitlist | Brand | Domain |
+|----------|-------|--------|
+| Product A Beta | Acme Blue | `waitlist.acme.com` |
+| Product B Launch | Acme Green | `signup.productb.com` |
+| Internal Survey | Corporate | `internal.acme.com` |
+
+Configure each waitlist's branding in its **Settings** → **Email** tab.
+
+---
+
+## Best Practices
+
+- **Use a verified domain** — Improves email deliverability
+- **Match your brand colors** — Consistency builds trust
+- **Include a logo** — Makes emails instantly recognizable
+- **Set a reply-to address** — So users can respond if needed
+- **Create custom redirect pages** — Don't send users to a generic page
+
+---
+
+## Next Steps
+
+<div class="grid sm:grid-cols-2 gap-3 not-prose mt-6">
+  <LinkCard
+    title="Email Templates"
+    description="Customize email content"
+    href="/docs/emails"
+  />
+  <LinkCard
+    title="Getting Started"
+    description="Back to setup guide"
+    href="/docs/getting-started"
+  />
+</div>

@@ -1,0 +1,358 @@
+---
+import { getCollection } from 'astro:content';
+import DocsLayout from '../../layouts/DocsLayout.astro';
+
+const docs = await getCollection('docs');
+const sortedDocs = docs.sort((a, b) => (a.data.order || 99) - (b.data.order || 99));
+---
+
+<DocsLayout title="Documentation - 0list" description="Everything you need to deploy, configure, and integrate 0list." ogImage="/og/docs.webp">
+  <!-- Decorative gradient blob -->
+  <div class="hero-glow"></div>
+
+  <div class="docs-hero">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Documentation
+    </div>
+    <h1>Build with <span class="gradient-text">0list</span></h1>
+    <p class="lead">
+      Deploy, configure, and integrate your self-hosted waitlist in minutes.
+    </p>
+  </div>
+
+  <!-- Hero Cards -->
+  <div class="hero-cards">
+    <a href="/docs/getting-started" class="hero-card">
+      <div class="hero-card-icon hero-card-icon--orange">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+      </div>
+      <div class="hero-card-content">
+        <h3>Getting Started</h3>
+        <p>Deploy your first waitlist in 5 minutes with our quick start guide.</p>
+      </div>
+      <div class="hero-card-arrow">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+    </a>
+
+    <a href="/docs/api" class="hero-card">
+      <div class="hero-card-icon hero-card-icon--blue">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+        </svg>
+      </div>
+      <div class="hero-card-content">
+        <h3>API Reference</h3>
+        <p>Complete REST API documentation with examples and error codes.</p>
+      </div>
+      <div class="hero-card-arrow">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+    </a>
+
+    <a href="/docs/configuration" class="hero-card">
+      <div class="hero-card-icon hero-card-icon--purple">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+      </div>
+      <div class="hero-card-content">
+        <h3>Configuration</h3>
+        <p>Environment variables, Cloudflare Access, and email setup.</p>
+      </div>
+      <div class="hero-card-arrow">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+    </a>
+
+    <a href="/docs/emails" class="hero-card">
+      <div class="hero-card-icon hero-card-icon--green">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+      </div>
+      <div class="hero-card-content">
+        <h3>Email Templates</h3>
+        <p>Customize confirmation and welcome emails with your branding.</p>
+      </div>
+      <div class="hero-card-arrow">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+    </a>
+  </div>
+
+  <!-- All Docs Section -->
+  <div class="all-docs">
+    <h2>Explore all docs</h2>
+    <div class="docs-grid">
+      {sortedDocs.map((doc) => (
+        <a href={`/docs/${doc.id}`} class="doc-card">
+          <h4>{doc.data.title}</h4>
+          <p>{doc.data.description}</p>
+        </a>
+      ))}
+    </div>
+  </div>
+</DocsLayout>
+
+<style>
+  .hero-glow {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse at center, rgba(244, 129, 32, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .docs-hero {
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    background: var(--muted);
+    border: 1px solid var(--border);
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    margin-bottom: 1rem;
+  }
+
+  .hero-badge-dot {
+    width: 6px;
+    height: 6px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .docs-hero h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #f48120 0%, #fb923c 50%, #fbbf24 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .docs-hero .lead {
+    font-size: 1rem;
+    color: var(--muted-foreground);
+    margin: 0;
+  }
+
+  .hero-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .hero-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hero-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 1rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(244, 129, 32, 0.03) 100%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .hero-card:hover::before {
+    opacity: 1;
+  }
+
+  .hero-card:hover {
+    border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px -8px rgba(0, 0, 0, 0.25);
+  }
+
+  .hero-card-icon {
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-card-icon svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .hero-card-icon--orange {
+    background: linear-gradient(135deg, rgba(251, 146, 60, 0.2), rgba(251, 146, 60, 0.1));
+    color: #fb923c;
+  }
+
+  .hero-card-icon--blue {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
+    color: #3b82f6;
+  }
+
+  .hero-card-icon--purple {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1));
+    color: #a855f7;
+  }
+
+  .hero-card-icon--green {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
+    color: #22c55e;
+  }
+
+  .hero-card-content {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-card-content h3 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin: 0 0 0.125rem 0;
+  }
+
+  .hero-card-content p {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .hero-card-arrow {
+    flex-shrink: 0;
+    color: var(--muted-foreground);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-card-arrow svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .hero-card:hover .hero-card-arrow {
+    opacity: 1;
+    transform: translateX(0);
+    color: var(--primary);
+  }
+
+  .all-docs {
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+  }
+
+  .all-docs h2 {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 1rem 0;
+  }
+
+  .docs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .docs-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .doc-card {
+    display: block;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .doc-card:hover {
+    background: var(--muted);
+    border-color: var(--border);
+  }
+
+  .doc-card h4 {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--foreground);
+    margin: 0 0 0.125rem 0;
+  }
+
+  .doc-card:hover h4 {
+    color: var(--primary);
+  }
+
+  .doc-card p {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    margin: 0;
+    line-height: 1.4;
+  }
+</style>

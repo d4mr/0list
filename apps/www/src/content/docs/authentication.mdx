@@ -1,0 +1,202 @@
+---
+title: Authentication
+description: Secure your admin dashboard with Cloudflare Access.
+order: 3
+---
+
+import { Steps, Callout, CodeBlock, LinkCard } from '../../components/docs';
+
+# Authentication
+
+Secure your admin dashboard with Cloudflare Access - a zero-trust authentication solution that protects your admin routes without any code changes.
+
+<Callout type="warning" title="Important">
+  By default, the admin dashboard is **unprotected**. Anyone with the URL can access it. Always configure Cloudflare Access before deploying to production.
+</Callout>
+
+## Why Cloudflare Access?
+
+- **Zero-trust security** - Every request is authenticated
+- **No passwords to manage** - Use identity providers like Google, GitHub, or email OTP
+- **Free tier available** - Up to 50 users at no cost
+- **Instant setup** - No code changes required, just configuration
+
+## Setup Guide
+
+<Steps>
+  <div>
+    ### Enable Cloudflare Access
+
+    1. Go to your [Cloudflare dashboard](https://dash.cloudflare.com)
+    2. Select **Zero Trust** from the sidebar
+    3. If this is your first time, you'll be prompted to create a team name (e.g., `your-company`)
+  </div>
+
+  <div>
+    ### Create an Access Application
+
+    1. In Zero Trust, go to **Access** → **Applications**
+    2. Click **Add an application**
+    3. Select **Self-hosted**
+    4. Configure the application:
+
+    | Field | Value |
+    |-------|-------|
+    | Application name | `0list Admin` |
+    | Session duration | `24 hours` (or your preference) |
+    | Application domain | `your-worker.workers.dev` |
+    | Path | `/admin` |
+
+    <Callout type="tip">
+      If you're using a custom domain, use that instead of the workers.dev domain.
+    </Callout>
+  </div>
+
+  <div>
+    ### Configure Identity Providers
+
+    1. Go to **Settings** → **Authentication**
+    2. Add your preferred identity providers:
+       - **Google** - Best for Google Workspace users
+       - **GitHub** - Great for developer teams
+       - **One-time PIN** - Email-based authentication (no setup required)
+
+    For most setups, the built-in **One-time PIN** provider works great and requires no additional configuration.
+  </div>
+
+  <div>
+    ### Create an Access Policy
+
+    1. Back in your application, go to the **Policies** tab
+    2. Click **Add a policy**
+    3. Configure who can access:
+
+    <CodeBlock
+      title="Example: Allow specific emails"
+      lang="text"
+      code={`Policy name: Admins
+Action: Allow
+
+Include:
+  - Emails: admin@yourcompany.com, team@yourcompany.com
+
+Or use email domains:
+  - Emails ending in: @yourcompany.com`}
+    />
+  </div>
+
+  <div>
+    ### Get Your Application Credentials
+
+    1. In your application settings, find the **Application Audience (AUD) Tag**
+    2. Your team domain is `https://<team-name>.cloudflareaccess.com`
+    3. Note both values for the next step
+  </div>
+
+  <div>
+    ### Configure Environment Variables
+
+    Set the following environment variables in your Cloudflare Worker:
+
+    <CodeBlock
+      title="Using Wrangler CLI"
+      lang="bash"
+      code={`wrangler secret put CF_ACCESS_TEAM_DOMAIN
+# Enter: https://your-team.cloudflareaccess.com
+
+wrangler secret put CF_ACCESS_AUD
+# Enter: your-application-audience-tag`}
+    />
+
+    Or set them in the Cloudflare dashboard under **Workers & Pages** → **Your Worker** → **Settings** → **Variables and Secrets**.
+  </div>
+
+  <div>
+    ### Deploy and Test
+
+    <CodeBlock title="Terminal" lang="bash" code="bun run deploy" />
+
+    Visit your admin dashboard. You should now be prompted to authenticate through Cloudflare Access.
+  </div>
+</Steps>
+
+## How It Works
+
+When Cloudflare Access is configured:
+
+1. Users visiting `/admin/*` routes are redirected to Cloudflare Access login
+2. After authentication, Cloudflare sets a JWT cookie (`CF_Authorization`)
+3. 0list validates this JWT on every request using your `CF_ACCESS_AUD` and `CF_ACCESS_TEAM_DOMAIN`
+4. The authenticated user's email is extracted and displayed in the admin UI
+
+## Environment Variables Reference
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `CF_ACCESS_TEAM_DOMAIN` | Your Cloudflare Access team URL | `https://mycompany.cloudflareaccess.com` |
+| `CF_ACCESS_AUD` | Application Audience Tag from Access | `abc123def456...` |
+
+## Development Mode
+
+During local development, Cloudflare Access is automatically bypassed. You'll see:
+
+- A **"No Auth"** warning badge in the navbar
+- **"Development Mode"** under your user menu
+- A mock user email for testing
+
+This allows you to develop without setting up Access locally.
+
+## Troubleshooting
+
+### "No Auth" warning in production
+
+Make sure both environment variables are set:
+
+<CodeBlock
+  title="Terminal"
+  lang="bash"
+  code={`# Verify secrets are set
+wrangler secret list
+
+# Should show:
+# CF_ACCESS_TEAM_DOMAIN
+# CF_ACCESS_AUD`}
+/>
+
+### Authentication loop
+
+If you're stuck in a login loop:
+
+1. Clear your browser cookies for the domain
+2. Verify your Access policy allows your email
+3. Check that the application domain matches exactly
+
+### JWT validation errors
+
+Check your Worker logs for detailed error messages:
+
+<CodeBlock
+  title="Terminal"
+  lang="bash"
+  code="wrangler tail"
+/>
+
+Common issues:
+- Incorrect `CF_ACCESS_AUD` value
+- Team domain missing `https://` prefix
+- Clock skew between servers (rare)
+
+## Next Steps
+
+<div class="grid sm:grid-cols-2 gap-4 not-prose">
+  <LinkCard
+    title="Configuration"
+    description="Other environment variables"
+    href="/docs/configuration"
+  />
+  <LinkCard
+    title="API Reference"
+    description="Secure API endpoints"
+    href="/docs/api"
+  />
+</div>

@@ -1,0 +1,176 @@
+---
+title: Custom Fields
+description: Collect additional user data during waitlist signup.
+order: 5
+---
+
+import { Steps, Callout, CodeBlock, LinkCard } from '../../components/docs';
+
+# Custom Fields
+
+Collect additional user data during waitlist signup.
+
+## Overview
+
+Custom fields let you collect more than just email and name from your signups. Common use cases include:
+
+- Company name or role
+- How they heard about you
+- Product interest or use case
+- Country or timezone
+
+---
+
+## Creating Custom Fields
+
+<Steps>
+  <div>Go to your waitlist in the admin dashboard</div>
+  <div>Navigate to **Settings** → **Custom Fields**</div>
+  <div>Click **"Add Field"**</div>
+  <div>Configure the field type, label, and validation</div>
+</Steps>
+
+### Field Types
+
+| Type | Description |
+|------|-------------|
+| **Text** | Single-line text input |
+| **Textarea** | Multi-line text input |
+| **Select** | Dropdown with predefined options |
+| **Number** | Numeric input |
+| **URL** | URL with validation |
+
+### Field Options
+
+| Option | Description |
+|--------|-------------|
+| **Label** | Display name shown to users |
+| **Key** | API key (auto-generated from label) |
+| **Required** | Whether the field is mandatory |
+| **Placeholder** | Hint text shown in the input |
+| **Options** | For select fields, the list of choices |
+
+---
+
+## Using Custom Fields in API
+
+Pass custom field values in the `customFields` object when calling the signup endpoint:
+
+<CodeBlock
+  title="signup.ts"
+  lang="typescript"
+  code={`const response = await fetch(
+  "https://your-worker.workers.dev/api/w/my-waitlist/signup",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: "user@example.com",
+      name: "Jane Doe",
+      customFields: {
+        company: "Acme Inc",
+        role: "Developer",
+        useCase: "Building a SaaS product"
+      }
+    })
+  }
+);`}
+/>
+
+---
+
+## Validation
+
+Custom fields support several validation options:
+
+### Required Fields
+
+Mark a field as required to ensure users always provide a value. The API will return an error if a required field is missing:
+
+<CodeBlock
+  title="Error Response"
+  lang="json"
+  code={`{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Missing required field: company"
+  }
+}`}
+/>
+
+### Select Options
+
+For select fields, the value must match one of the predefined options:
+
+<CodeBlock
+  title="Select Field Config"
+  lang="json"
+  code={`{
+  "type": "select",
+  "key": "plan",
+  "label": "Which plan interests you?",
+  "required": true,
+  "options": [
+    "Starter",
+    "Pro",
+    "Enterprise"
+  ]
+}`}
+/>
+
+---
+
+## Exporting Data
+
+Custom field data is included when exporting signups:
+
+- **CSV Export:** Each custom field becomes a column
+- **API:** Custom fields are returned in the `customFields` object
+
+<CodeBlock
+  title="API Response"
+  lang="json"
+  code={`{
+  "signups": [
+    {
+      "email": "user@example.com",
+      "name": "Jane Doe",
+      "customFields": {
+        "company": "Acme Inc",
+        "role": "Developer"
+      }
+    }
+  ]
+}`}
+/>
+
+---
+
+## Best Practices
+
+<Callout type="tip" title="Keep it minimal">
+  Only collect data you actually need. More fields = lower conversion rates.
+</Callout>
+
+- **Limit to 2-3 fields** — Every extra field reduces signups
+- **Make most fields optional** — Only require truly essential data
+- **Use clear labels** — Help users understand what you're asking
+- **Provide placeholders** — Give examples of expected input
+
+---
+
+## Next Steps
+
+<div class="grid sm:grid-cols-2 gap-3 not-prose mt-6">
+  <LinkCard
+    title="API Reference"
+    description="See custom fields in API responses"
+    href="/docs/api"
+  />
+  <LinkCard
+    title="Branding"
+    description="Customize your waitlist appearance"
+    href="/docs/branding"
+  />
+</div>

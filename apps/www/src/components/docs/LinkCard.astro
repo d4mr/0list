@@ -1,0 +1,79 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  href: string;
+  icon?: string;
+}
+
+const { title, description, href, icon } = Astro.props;
+---
+
+<a href={href} class="link-card">
+  <div class="link-card-content">
+    <h4>{title}</h4>
+    <p>{description}</p>
+  </div>
+  <svg class="link-card-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+  </svg>
+</a>
+
+<style>
+  .link-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    text-decoration: none !important;
+    transition: all 0.15s ease;
+  }
+
+  .link-card:hover {
+    border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+    background: var(--muted);
+  }
+
+  .link-card-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .link-card-content h4 {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--foreground);
+    margin: 0 0 0.125rem 0;
+    transition: color 0.15s ease;
+  }
+
+  .link-card:hover .link-card-content h4 {
+    color: var(--primary);
+  }
+
+  .link-card-content p {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .link-card-arrow {
+    flex-shrink: 0;
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--muted-foreground);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.15s ease;
+  }
+
+  .link-card:hover .link-card-arrow {
+    opacity: 1;
+    transform: translateX(0);
+    color: var(--primary);
+  }
+</style>

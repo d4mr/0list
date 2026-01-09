@@ -1,0 +1,156 @@
+---
+title: Email Templates
+description: Customize confirmation and welcome emails for your waitlists.
+order: 4
+---
+
+import { Steps, Callout, CodeBlock, LinkCard } from '../../components/docs';
+
+# Email Templates
+
+Customize confirmation and welcome emails for your waitlists.
+
+## Overview
+
+0list sends two types of emails when double opt-in is enabled:
+
+1. **Confirmation Email** — Sent immediately after signup with a verification link
+2. **Welcome Email** — Sent after the user confirms their email
+
+Both templates can be customized per-waitlist in the admin dashboard under **Settings** → **Email**.
+
+---
+
+## Confirmation Email
+
+This email is sent when a user signs up and double opt-in is enabled. It contains a unique confirmation link.
+
+### Available Variables
+
+| Variable | Description |
+|----------|-------------|
+| `{{name}}` | User's name (if provided) |
+| `{{email}}` | User's email address |
+| `{{position}}` | Current waitlist position |
+| `{{confirmUrl}}` | Unique confirmation link **(required)** |
+| `{{waitlistName}}` | Name of the waitlist |
+
+<CodeBlock
+  title="Default Template"
+  lang="html"
+  code={`<h1>Confirm your spot on {{waitlistName}}</h1>
+
+<p>Hi {{name}},</p>
+
+<p>Thanks for signing up! Click the button below to confirm your email address and secure your spot.</p>
+
+<a href="{{confirmUrl}}" style="
+  display: inline-block;
+  padding: 12px 24px;
+  background: #f97316;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+">
+  Confirm Email
+</a>
+
+<p>You're currently #{{position}} on the waitlist.</p>
+
+<p>If you didn't sign up, you can ignore this email.</p>`}
+/>
+
+<Callout type="warning" title="Important">
+  The confirmation email must include `{{confirmUrl}}` or users won't be able to verify their email.
+</Callout>
+
+---
+
+## Welcome Email
+
+This email is sent after a user successfully confirms their email address.
+
+### Available Variables
+
+| Variable | Description |
+|----------|-------------|
+| `{{name}}` | User's name (if provided) |
+| `{{email}}` | User's email address |
+| `{{position}}` | Final confirmed position |
+| `{{waitlistName}}` | Name of the waitlist |
+
+<CodeBlock
+  title="Default Template"
+  lang="html"
+  code={`<h1>You're in! 🎉</h1>
+
+<p>Hi {{name}},</p>
+
+<p>Your email has been confirmed. You're now #{{position}} on the {{waitlistName}} waitlist.</p>
+
+<p>We'll notify you as soon as we're ready to let you in.</p>
+
+<p>Thanks for your patience!</p>`}
+/>
+
+---
+
+## Email Branding
+
+Customize the sender information and visual branding for each waitlist.
+
+| Setting | Description |
+|---------|-------------|
+| **From Name** | The name shown in the recipient's inbox |
+| **From Email** | The email address emails are sent from |
+| **Reply-To** | Where replies are directed |
+| **Logo URL** | Your company logo (displayed in email header) |
+| **Primary Color** | Brand color for buttons and links |
+| **Company Name** | Used in email footer |
+
+<CodeBlock
+  title="Branding Configuration"
+  lang="json"
+  code={`{
+  "fromName": "Acme Inc",
+  "fromEmail": "hello@acme.com",
+  "replyTo": "support@acme.com",
+  "logoUrl": "https://acme.com/logo.png",
+  "primaryColor": "#4F46E5",
+  "companyName": "Acme Inc"
+}`}
+/>
+
+---
+
+## Testing Emails
+
+You can send test emails from the admin dashboard to preview how they'll look:
+
+<Steps>
+  <div>Go to your waitlist's **Settings** → **Email**</div>
+  <div>Edit your template</div>
+  <div>Click **"Send Test Email"**</div>
+  <div>Check your inbox for the preview</div>
+</Steps>
+
+<Callout type="tip">
+  Test emails use placeholder values for variables like position and confirmation URL.
+</Callout>
+
+---
+
+## Next Steps
+
+<div class="grid sm:grid-cols-2 gap-3 not-prose mt-6">
+  <LinkCard
+    title="Branding"
+    description="Customize colors and logos"
+    href="/docs/branding"
+  />
+  <LinkCard
+    title="Custom Fields"
+    description="Collect additional signup data"
+    href="/docs/custom-fields"
+  />
+</div>

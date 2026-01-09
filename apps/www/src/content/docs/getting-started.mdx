@@ -1,0 +1,144 @@
+---
+title: Getting Started
+description: Deploy your own waitlist backend on Cloudflare Workers in under 5 minutes.
+order: 1
+---
+
+import { Steps, Callout, CodeBlock, LinkCard } from '../../components/docs';
+
+# Getting Started
+
+Deploy your own waitlist backend on Cloudflare Workers in under 5 minutes.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- A [Cloudflare account](https://dash.cloudflare.com/sign-up) (free tier works)
+- [Bun](https://bun.sh) or Node.js 18+ installed
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/) installed and authenticated
+- (Optional) [Resend](https://resend.com) account for confirmation emails
+
+## Quick Start
+
+<Steps>
+  <div>
+    ### Create your project
+
+    <CodeBlock
+      title="Terminal"
+      lang="bash"
+      code={`npx create-0list my-waitlist
+cd my-waitlist`}
+    />
+  </div>
+
+  <div>
+    ### Install dependencies
+
+    <CodeBlock title="Terminal" lang="bash" code="bun install" />
+  </div>
+
+  <div>
+    ### Create D1 database
+
+    <CodeBlock title="Terminal" lang="bash" code="bunx wrangler d1 create 0list-db" />
+
+    Copy the `database_id` from the output and update your `wrangler.toml`.
+  </div>
+
+  <div>
+    ### Run migrations
+
+    <CodeBlock
+      title="Terminal"
+      lang="bash"
+      code={`# Local development
+bun run db:migrate:local
+
+# Production
+bun run db:migrate:prod`}
+    />
+  </div>
+
+  <div>
+    ### Start development
+
+    <CodeBlock title="Terminal" lang="bash" code="bun run dev" />
+
+    Your API is now running at `http://localhost:8787` and admin dashboard at `http://localhost:5173`.
+  </div>
+</Steps>
+
+## Deployment
+
+Deploy to Cloudflare Workers with a single command:
+
+<CodeBlock title="Terminal" lang="bash" code="bun run deploy" />
+
+This will:
+
+1. Build the API and admin dashboard
+2. Deploy the Worker to your Cloudflare account
+3. Set up the D1 database binding
+
+<Callout type="tip" title="Custom Domain">
+  Add a custom domain in the Cloudflare dashboard under Workers & Pages → your worker → Settings → Domains & Routes.
+</Callout>
+
+## Creating Your First Waitlist
+
+Once deployed, visit your admin dashboard and create a new waitlist:
+
+<Steps>
+  <div>Click **"New Waitlist"** in the dashboard</div>
+  <div>Enter a name and unique slug (e.g., `beta-launch`)</div>
+  <div>Configure double opt-in settings (recommended)</div>
+  <div>Add any custom fields you need</div>
+</Steps>
+
+Then integrate with your frontend:
+
+<CodeBlock
+  title="signup.ts"
+  lang="typescript"
+  code={`const response = await fetch(
+  "https://your-worker.workers.dev/api/waitlists/beta-launch/signup",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: "user@example.com",
+      name: "Jane Doe"
+    })
+  }
+);
+
+const { position } = await response.json();
+// position: 42`}
+/>
+
+## Next Steps
+
+<div class="grid sm:grid-cols-2 gap-4 not-prose">
+  <LinkCard
+    title="Configuration"
+    description="Environment variables and settings"
+    href="/docs/configuration"
+  />
+  <LinkCard
+    title="API Reference"
+    description="Explore all API endpoints"
+    href="/docs/api"
+  />
+  <LinkCard
+    title="Email Templates"
+    description="Customize confirmation emails"
+    href="/docs/emails"
+  />
+  <LinkCard
+    title="Custom Fields"
+    description="Collect additional user data"
+    href="/docs/custom-fields"
+  />
+</div>

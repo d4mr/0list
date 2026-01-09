@@ -1,0 +1,30 @@
+{
+  "name": "@d4mr/0list",
+  "private": true,
+  "description": "Self-hosted waitlist software for Cloudflare Workers",
+  "license": "MIT",
+  "author": {
+    "name": "d4mr",
+    "url": "https://github.com/d4mr"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/d4mr/0list.git"
+  },
+  "homepage": "https://0list.d4mr.com",
+  "bugs": {
+    "url": "https://github.com/d4mr/0list/issues"
+  },
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "deploy": "turbo deploy --filter=@d4mr/0list-api"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0"
+  },
+  "packageManager": "bun@1.2.4"
+}
