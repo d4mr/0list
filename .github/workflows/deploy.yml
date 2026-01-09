@@ -81,7 +81,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/api
-          command: d1 migrations apply ${{ secrets.D1_DATABASE_NAME }} --remote
+          command: d1 migrations apply ${{ secrets.D1_DATABASE_NAME }} --remote --config wrangler.demo.toml
 
       - name: Seed database
         uses: cloudflare/wrangler-action@v3
@@ -89,7 +89,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/api
-          command: d1 execute ${{ secrets.D1_DATABASE_NAME }} --remote --file=scripts/seed.sql
+          command: d1 execute ${{ secrets.D1_DATABASE_NAME }} --remote --file=scripts/seed.sql --config wrangler.demo.toml
 
       - name: Deploy worker
         uses: cloudflare/wrangler-action@v3
