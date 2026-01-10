@@ -64,7 +64,7 @@ export function ConfirmationEmail({
           <Section style={footer}>
             <Text style={footerText}>
               This email was sent by {waitlistName}. Powered by{" "}
-              <Link href="https://github.com/0list/0list" style={footerLink}>
+              <Link href="https://github.com/d4mr/0list" style={footerLink}>
                 0list
               </Link>
             </Text>
