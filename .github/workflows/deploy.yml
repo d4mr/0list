@@ -74,6 +74,10 @@ jobs:
 
           [vars]
           DEMO_MODE = "true"
+
+          [[routes]]
+          pattern = "demo.0list.d4mr.com"
+          custom_domain = true
           EOF
 
       - name: Run migrations
