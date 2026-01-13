@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import PostHog from '../components/posthog.astro';
 
 interface Props {
   title: string;
@@ -41,6 +42,9 @@ const ogImageURL = new URL(ogImage, SITE_URL);
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+
+    <!-- PostHog Analytics -->
+    <PostHog />
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
