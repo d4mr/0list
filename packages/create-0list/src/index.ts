@@ -1,9 +1,11 @@
-#!/usr/bin/env node
 import * as p from "@clack/prompts";
 import pc from "picocolors";
-import { execSync } from "child_process";
+import { exec, execSync } from "child_process";
 import { existsSync, readFileSync, writeFileSync, rmSync } from "fs";
 import path from "path";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
 
 const REPO = "d4mr/0list";
 
@@ -32,34 +34,24 @@ function getPackageManagerCommand(pm: PackageManager) {
   return commands[pm];
 }
 
-function runCommand(
+async function runCommand(
   command: string,
   cwd?: string
 ): Promise<{ success: boolean; output: string }> {
-  return new Promise((resolve) => {
-    try {
-      const output = execSync(command, {
-        cwd,
-        stdio: "pipe",
-        encoding: "utf-8",
-      });
-      resolve({ success: true, output: output || "" });
-    } catch (error: any) {
-      resolve({
-        success: false,
-        output: error.stderr || error.stdout || error.message,
-      });
-    }
-  });
+  try {
+    const { stdout, stderr } = await execAsync(command, { cwd });
+    return { success: true, output: stdout || stderr || "" };
+  } catch (error: any) {
+    return {
+      success: false,
+      output: error.stderr || error.stdout || error.message,
+    };
+  }
 }
 
-function checkWranglerAuth(): boolean {
-  try {
-    execSync("npx wrangler whoami", { stdio: "pipe" });
-    return true;
-  } catch {
-    return false;
-  }
+async function checkWranglerAuth(): Promise<boolean> {
+  const result = await runCommand("npx wrangler whoami");
+  return result.success;
 }
 
 async function main() {
@@ -198,14 +190,18 @@ rm -rf .github 2>/dev/null
   }
 
   let dbId: string | null = null;
+  const dbName = `${project.name}-db`;
 
   if (setupCloudflare) {
+    p.log.step(pc.dim("Setting up Cloudflare..."));
+
     // Check wrangler auth
     s.start("Checking Cloudflare authentication...");
-    const isAuthed = checkWranglerAuth();
+    const isAuthed = await checkWranglerAuth();
+    s.stop();
 
     if (!isAuthed) {
-      s.stop(pc.yellow("Not logged into Cloudflare"));
+      p.log.warn("Not logged into Cloudflare");
 
       const login = await p.confirm({
         message: "Log in to Cloudflare now?",
@@ -224,37 +220,37 @@ rm -rf .github 2>/dev/null
             cwd: targetDir,
             stdio: "inherit"
           });
+          p.log.success("Logged in to Cloudflare");
         } catch {
           p.log.warn("Login may have failed. Continuing anyway...");
         }
       }
     } else {
-      s.stop(pc.green("Authenticated with Cloudflare"));
+      p.log.success("Authenticated with Cloudflare");
     }
 
     // Create D1 database
-    s.start("Creating D1 database...");
-    const dbName = `${project.name}-db`;
+    s.start(`Creating D1 database "${dbName}"...`);
     const createDbResult = await runCommand(
       `npx wrangler d1 create ${dbName}`,
       targetDir
     );
+    s.stop();
 
     if (!createDbResult.success) {
-      s.stop(pc.yellow("Could not create database"));
-      p.log.warn(
-        "You may need to create it manually or the name might be taken."
-      );
+      p.log.warn(`Could not create database "${dbName}"`);
+      p.log.message(pc.dim("You may need to create it manually or the name might be taken."));
     } else {
-      s.stop(pc.green(`Database "${dbName}" created`));
+      p.log.success(`Database "${dbName}" created`);
 
-      // Extract database ID from output
-      const match = createDbResult.output.match(/database_id\s*=\s*"([^"]+)"/);
+      // Extract database ID from output (handles both JSON and TOML formats)
+      const match = createDbResult.output.match(/"?database_id"?\s*[:=]\s*"([^"]+)"/);
       if (match) {
         dbId = match[1];
+        p.log.message(pc.dim(`  ID: ${dbId}`));
 
         // Update wrangler.toml with the database ID
-        s.start("Updating configuration...");
+        s.start("Updating wrangler.toml...");
         const wranglerPath = path.join(targetDir, "apps", "api", "wrangler.toml");
         if (existsSync(wranglerPath)) {
           let wranglerContent = readFileSync(wranglerPath, "utf-8");
@@ -267,26 +263,29 @@ rm -rf .github 2>/dev/null
             `database_name = "${dbName}"`
           );
           writeFileSync(wranglerPath, wranglerContent);
-          s.stop(pc.green("Configuration updated"));
+          s.stop();
+          p.log.success("Configuration updated");
         } else {
-          s.stop(pc.yellow("Could not find wrangler.toml"));
+          s.stop();
+          p.log.warn("Could not find wrangler.toml");
         }
       }
     }
 
     // Run migrations
     if (dbId) {
-      s.start("Running database migrations...");
+      s.start("Running database migrations (local)...");
       const migrateResult = await runCommand(
-        `${pmCmd.exec} wrangler d1 migrations apply ${project.name}-db --local`,
+        `${pmCmd.exec} wrangler d1 migrations apply ${dbName} --local`,
         targetDir
       );
+      s.stop();
 
       if (migrateResult.success) {
-        s.stop(pc.green("Migrations applied"));
+        p.log.success("Local migrations applied");
       } else {
-        s.stop(pc.yellow("Could not run migrations"));
-        p.log.warn("You can run migrations manually later.");
+        p.log.warn("Could not run migrations");
+        p.log.message(pc.dim("You can run migrations manually later."));
       }
     }
   }
@@ -294,19 +293,32 @@ rm -rf .github 2>/dev/null
   // Final summary
   console.log();
 
-  const nextSteps = [
-    `cd ${project.directory}`,
-    ...(setupCloudflare && dbId
-      ? [`${pm === "npm" ? "npm run" : pm} dev`]
-      : [
-          `${pmCmd.exec} wrangler d1 create ${project.name}-db`,
-          "# Update wrangler.toml with database_id",
-          `${pm === "npm" ? "npm run" : pm} db:migrate:local`,
-          `${pm === "npm" ? "npm run" : pm} dev`,
-        ]),
-  ];
+  const runCmd = pm === "npm" ? "npm run" : pm;
 
-  p.note(nextSteps.join("\n"), "Next steps");
+  if (setupCloudflare && dbId) {
+    p.log.success("D1 database configured in wrangler.toml");
+    
+    const nextSteps = [
+      `cd ${project.directory}`,
+      `${runCmd} dev`,
+    ];
+    p.note(nextSteps.join("\n"), "Start developing");
+
+    const deploySteps = [
+      `${runCmd} db:migrate        ${pc.dim("# Apply schema to remote D1")}`,
+      `${runCmd} deploy            ${pc.dim("# Deploy to Cloudflare Workers")}`,
+    ];
+    p.note(deploySteps.join("\n"), "Deploy to production");
+  } else {
+    const nextSteps = [
+      `cd ${project.directory}`,
+      `${pmCmd.exec} wrangler d1 create ${dbName}`,
+      `${pc.dim("# Copy database_id to apps/api/wrangler.toml")}`,
+      `${runCmd} db:migrate:local`,
+      `${runCmd} dev`,
+    ];
+    p.note(nextSteps.join("\n"), "Next steps");
+  }
 
   p.log.info(
     `${pc.dim("Tip:")} Pull updates anytime with ${pc.cyan("git pull upstream main")}`

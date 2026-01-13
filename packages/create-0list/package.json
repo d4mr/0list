@@ -1,6 +1,6 @@
 {
   "name": "create-0list",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI to scaffold and deploy 0list waitlist software",
   "type": "module",
   "license": "MIT",
